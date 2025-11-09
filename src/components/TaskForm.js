@@ -1,81 +1,43 @@
-import { useState, useEffect } from 'react';
-import { Button, Form, Modal } from 'react-bootstrap';
+// src/components/TaskForm.js
+import React, { useState } from 'react';
 
-const TaskForm = ({ show, handleClose, addTask, editTask, taskToEdit }) => {
-  const [task, setTask] = useState({ name: '', priority: 'Medium', status: 'To Do' });
+function TaskForm({ setTasks, tasks }) {
+  const [form, setForm] = useState({
+    title: '',
+    description: '',
+    deadline: '',
+    priority: 'Medium',
+    status: 'To Do'
+  });
 
-  useEffect(() => {
-    if (taskToEdit) {
-      setTask(taskToEdit);
-    }
-  }, [taskToEdit]);
-
-  const handleChange = (e) => {
-    setTask({ ...task, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = () => {
-    if (taskToEdit) {
-      editTask(task);
-    } else {
-      addTask(task);
-    }
-    setTask({ name: '', priority: 'Medium', status: 'To Do' });
-    handleClose();
+  const handleSubmit = e => {
+    e.preventDefault();
+    setTasks([...tasks, { ...form, id: Date.now() }]);
+    setForm({ title: '', description: '', deadline: '', priority: 'Medium', status: 'To Do' });
   };
 
   return (
-    <Modal show={show} onHide={handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>{taskToEdit ? 'Edit Task' : 'Add Task'}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Group controlId="taskName">
-            <Form.Label>Task</Form.Label>
-            <Form.Control
-              type="text"
-              name="name"
-              value={task.name}
-              onChange={handleChange}
-            />
-          </Form.Group>
-
-          <Form.Group controlId="taskPriority">
-            <Form.Label>Priority</Form.Label>
-            <Form.Select
-              name="priority"
-              value={task.priority}
-              onChange={handleChange}
-            >
-              <option>High</option>
-              <option>Medium</option>
-              <option>Low</option>
-            </Form.Select>
-          </Form.Group>
-
-          <Form.Group controlId="taskStatus">
-            <Form.Label>Status</Form.Label>
-            <Form.Select
-              name="status"
-              value={task.status}
-              onChange={handleChange}
-            >
-              <option>To Do</option>
-              <option>In Progress</option>
-              <option>Completed</option>
-            </Form.Select>
-          </Form.Group>
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>Close</Button>
-        <Button variant="primary" onClick={handleSubmit}>
-          {taskToEdit ? 'Update Task' : 'Add Task'}
-        </Button>
-      </Modal.Footer>
-    </Modal>
+    <form className="row g-2 p-3" onSubmit={handleSubmit}>
+      <input className="form-control" placeholder="Judul" value={form.title}
+        onChange={e => setForm({ ...form, title: e.target.value })} required />
+      <input className="form-control" placeholder="Deskripsi" value={form.description}
+        onChange={e => setForm({ ...form, description: e.target.value })} />
+      <input className="form-control" type="date" value={form.deadline}
+        onChange={e => setForm({ ...form, deadline: e.target.value })} />
+      <select className="form-select" value={form.priority}
+        onChange={e => setForm({ ...form, priority: e.target.value })}>
+        <option>High</option>
+        <option>Medium</option>
+        <option>Low</option>
+      </select>
+      <select className="form-select" value={form.status}
+        onChange={e => setForm({ ...form, status: e.target.value })}>
+        <option>To Do</option>
+        <option>In Progress</option>
+        <option>Done</option>
+      </select>
+      <button className="btn btn-primary w-100" type="submit">Tambah Tugas</button>
+    </form>
   );
-};
-
+}
 export default TaskForm;

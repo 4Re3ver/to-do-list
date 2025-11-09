@@ -1,58 +1,63 @@
-import React, { useState } from 'react';
-import { Container, Button } from 'react-bootstrap';
-import TaskList from './components/TaskList';
+import React, { useState, useEffect } from 'react';
+import Header from './components/Header';
 import TaskForm from './components/TaskForm';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import TaskList from './components/TaskList';
+import FilterBar from './components/FilterBar';
+import './App.css';
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
-  const [tasks, setTasks] = useState([]);
-  const [showForm, setShowForm] = useState(false);
+  const [tasks, setTasks] = useState(() => {
+    const saved = localStorage.getItem('tasks');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [filter, setFilter] = useState({ priority: 'All', status: 'All' });
+  const [search, setSearch] = useState('');
+  const [theme, setTheme] = useState('dark');
   const [taskToEdit, setTaskToEdit] = useState(null);
 
-  const handleShowForm = () => setShowForm(true);
-  const handleCloseForm = () => {
-    setShowForm(false);
-    setTaskToEdit(null);
-  };
+  // simpan otomatis ke localStorage setiap ada perubahan
+  useEffect(() => {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }, [tasks]);
 
   const addTask = (task) => {
     setTasks([...tasks, { ...task, id: Date.now() }]);
   };
 
-  const editTask = (updatedTask) => {
-    setTasks(tasks.map((task) => (task.id === updatedTask.id ? updatedTask : task)));
+  const updateTask = (updatedTask) => {
+    setTasks(tasks.map(t => (t.id === updatedTask.id ? updatedTask : t)));
+    setTaskToEdit(null);
   };
 
   const deleteTask = (id) => {
-    setTasks(tasks.filter((task) => task.id !== id));
-  };
-
-  const showEditForm = (task) => {
-    setTaskToEdit(task);
-    handleShowForm();
+    if (window.confirm('Yakin ingin menghapus tugas ini?')) {
+      setTasks(tasks.filter(t => t.id !== id));
+    }
   };
 
   return (
-    <Container className="my-5">
-      <h1 className="mb-4">Task List</h1>
-      <Button variant="primary" onClick={handleShowForm}>
-        Add Task
-      </Button>
-      <div className="mt-4">
+    <div className={`app theme-${theme} min-vh-100`}>
+      <Header search={search} setSearch={setSearch} theme={theme} setTheme={setTheme} />
+      <div className="container py-3">
+        <TaskForm
+          addTask={addTask}
+          updateTask={updateTask}
+          taskToEdit={taskToEdit}
+          setTaskToEdit={setTaskToEdit}
+        />
+        <FilterBar filter={filter} setFilter={setFilter} />
         <TaskList
           tasks={tasks}
-          deleteTask={deleteTask}
-          showEditForm={showEditForm}
-        />
-        <TaskForm
-          show={showForm}
-          handleClose={handleCloseForm}
-          addTask={addTask}
-          editTask={editTask}
-          taskToEdit={taskToEdit}
+          filter={filter}
+          search={search}
+          setTasks={setTasks}
+          onEdit={setTaskToEdit}
+          onDelete={deleteTask}
         />
       </div>
-    </Container>
+    </div>
   );
 }
 
