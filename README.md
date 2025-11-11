@@ -22,8 +22,8 @@ Aplikasi TodoList berbasis **ReactJS** dan **Bootstrap 5** (lokal).
 
 1. **Clone repository:**
     ```
-    git clone <YOUR-GITHUB-LINK>
-    cd react-todolist-crud
+    git clone https://github.com/4Re3ver/react-todolist-CRUD.git
+    cd react-todolist-CRUD
     ```
 
 2. **Install dependencies:**
